@@ -1,0 +1,204 @@
+{
+  "root_type": "Model",
+  "file_identifier": "0001",
+  "enums": {
+    "RenderedFaces": {
+      "type": "byte",
+      "values": { "ONE": 0, "TWO": 1 }
+    },
+    "Stroke": {
+      "type": "byte",
+      "values": { "DEFAULT": 0 }
+    },
+    "AxisPartClass": {
+      "type": "byte",
+      "values": { "NONE": 0, "WIRE": 1, "WIRE_SET": 2, "CIRCLE_CURVE": 3 }
+    },
+    "RepresentationClass": {
+      "type": "byte",
+      "values": { "NONE": 0, "SHELL": 1, "CIRCLE_EXTRUSION": 2 }
+    },
+    "ShellType": {
+      "type": "byte",
+      "values": { "NONE": 0, "BIG": 1 }
+    }
+  },
+  "structs": {
+    "FloatVector": {
+      "fields": {
+        "x": { "type": "float", "comment": "x coordinate, max 10^30" },
+        "y": { "type": "float", "comment": "y coordinate, max 10^30" },
+        "z": { "type": "float", "comment": "z coordinate, max 10^30" }
+      }
+    },
+    "DoubleVector": {
+      "fields": {
+        "x": { "type": "double", "comment": "x coordinate, max 10^308" },
+        "y": { "type": "double", "comment": "y coordinate, max 10^308" },
+        "z": { "type": "double", "comment": "z coordinate, max 10^308" }
+      }
+    },
+    "Transform": {
+      "fields": {
+        "position": { "type": "DoubleVector", "comment": "Position of the transform" },
+        "x_direction": { "type": "FloatVector", "comment": "X axis of the transform" },
+        "y_direction": { "type": "FloatVector", "comment": "Y axis of the transform" }
+      }
+    },
+    "Material": {
+      "fields": {
+        "r": { "type": "ubyte", "comment": "Red color value" },
+        "g": { "type": "ubyte", "comment": "Green color value" },
+        "b": { "type": "ubyte", "comment": "Blue color value" },
+        "a": { "type": "ubyte", "comment": "Alpha color value" },
+        "rendered_faces": { "type": "RenderedFaces", "comment": "Number of rendered faces" },
+        "stroke": { "type": "Stroke", "comment": "Line stroke type" }
+      }
+    },
+    "BoundingBox": {
+      "fields": {
+        "min": { "type": "FloatVector", "comment": "Minimum point" },
+        "max": { "type": "FloatVector", "comment": "Maximum point" }
+      }
+    },
+    "Wire": {
+      "fields": {
+        "p1": { "type": "FloatVector", "comment": "First point" },
+        "p2": { "type": "FloatVector", "comment": "Last point" }
+      }
+    },
+    "CircleCurve": {
+      "fields": {
+        "aperture": { "type": "float", "comment": "Angle of the arc" },
+        "position": { "type": "FloatVector", "comment": "Center of the arc" },
+        "radius": { "type": "float", "comment": "Radius of the arc" },
+        "x_direction": { "type": "FloatVector", "comment": "X axis of the arc" },
+        "y_direction": { "type": "FloatVector", "comment": "Y axis of the arc" }
+      }
+    },
+    "Representation": {
+      "fields": {
+        "id": { "type": "uint", "comment": "Index of geometry in its corresponding array" },
+        "bbox": { "type": "BoundingBox", "comment": "Bounding box of the geometry" },
+        "representation_class": { "type": "RepresentationClass", "comment": "Which array it belongs to: shells, circleExtrusions, etc." }
+      }
+    },
+    "Sample": {
+      "fields": {
+        "item": { "type": "uint", "comment": "Index of global transform and item in meshesItems" },
+        "material": { "type": "uint", "comment": "Index of material in materials" },
+        "representation": { "type": "uint", "comment": "Index of representation in representations" },
+        "local_transform": { "type": "uint", "comment": "Index of local transform in localTransforms" }
+      }
+    }
+  },
+  "tables": {
+    "WireSet": {
+      "fields": {
+        "ps": { "type": "[FloatVector]", "comment": "Ordered points of the wire set" }
+      }
+    },
+    "ShellHole": {
+      "fields": {
+        "indices": { "type": "[ushort]", "required": true, "comment": "Indices of hole points" },
+        "profile_id": { "type": "ushort", "comment": "Index of parent profile" }
+      }
+    },
+    "ShellProfile": {
+      "fields": {
+        "indices": { "type": "[ushort]", "required": true, "comment": "Indices of profile points" }
+      }
+    },
+    "BigShellHole": {
+      "fields": {
+        "indices": { "type": "[uint]", "required": true, "comment": "Indices of hole points" },
+        "profile_id": { "type": "ushort", "comment": "Index of parent profile" }
+      }
+    },
+    "BigShellProfile": {
+      "fields": {
+        "indices": { "type": "[uint]", "required": true, "comment": "Indices of profile points" }
+      }
+    },
+    "Axis": {
+      "fields": {
+        "wires": { "type": "[Wire]", "required": true, "comment": "Straight lines" },
+        "order": { "type": "[uint]", "required": true, "comment": "Indices of axis parts" },
+        "parts": { "type": "[AxisPartClass]", "required": true, "comment": "Class of axis parts" },
+        "wire_sets": { "type": "[WireSet]", "required": true, "comment": "Straight line sets" },
+        "circle_curves": { "type": "[CircleCurve]", "required": true, "comment": "Circular arcs" }
+      }
+    },
+    "Shell": {
+      "fields": {
+        "profiles": { "type": "[ShellProfile]", "required": true, "comment": "Exterior profiles (face loops as indices into points)" },
+        "holes": { "type": "[ShellHole]", "required": true, "comment": "Holes (interior cutouts)" },
+        "points": { "type": "[FloatVector]", "required": true, "comment": "3D vertices of the shell" },
+        "big_profiles": { "type": "[BigShellProfile]", "required": true, "comment": "Exterior profiles for >65535 points" },
+        "big_holes": { "type": "[BigShellHole]", "required": true, "comment": "Holes for >65535 points" },
+        "type": { "type": "ShellType", "comment": "NONE (<65535 pts) or BIG (>65535 pts)" },
+        "profiles_face_ids": { "type": "[ushort]", "required": true, "comment": "Face IDs for profiles" }
+      }
+    },
+    "CircleExtrusion": {
+      "fields": {
+        "radius": { "type": "[double]", "required": true, "comment": "Half thickness of extrusion" },
+        "axes": { "type": "[Axis]", "required": true, "comment": "Axes of the extrusion" }
+      }
+    },
+    "Meshes": {
+      "fields": {
+        "coordinates": { "type": "Transform", "required": true, "comment": "Global coordinates of the model (geographic location)" },
+        "meshes_items": { "type": "[uint]", "required": true, "comment": "Maps localIds indices to meshes" },
+        "samples": { "type": "[Sample]", "required": true, "comment": "All instances of meshes (geometry + material + transform)" },
+        "representations": { "type": "[Representation]", "required": true, "comment": "Common interface for all geometry types" },
+        "materials": { "type": "[Material]", "required": true, "comment": "Unique geometry materials" },
+        "circle_extrusions": { "type": "[CircleExtrusion]", "required": true, "comment": "Wire-with-thickness geometries (reinforcement bars)" },
+        "shells": { "type": "[Shell]", "required": true, "comment": "Face-and-hole geometries (breps)" },
+        "local_transforms": { "type": "[Transform]", "required": true, "comment": "Local transforms of samples" },
+        "global_transforms": { "type": "[Transform]", "required": true, "comment": "Global transforms assigned to local IDs via meshes_items" },
+        "material_ids": { "type": "[uint]", "comment": "Local IDs for materials" },
+        "representation_ids": { "type": "[uint]", "comment": "Local IDs for representations" },
+        "sample_ids": { "type": "[uint]", "comment": "Local IDs for samples" },
+        "local_transform_ids": { "type": "[uint]", "comment": "Local IDs for local transforms" },
+        "global_transform_ids": { "type": "[uint]", "comment": "Local IDs for global transforms" }
+      }
+    },
+    "Attribute": {
+      "fields": {
+        "data": { "type": "[string]", "required": true, "comment": "Item attributes as string array" }
+      }
+    },
+    "Relation": {
+      "fields": {
+        "data": { "type": "[string]", "required": true, "comment": "Item relation as string array" }
+      }
+    },
+    "SpatialStructure": {
+      "fields": {
+        "local_id": { "type": "uint", "default": null, "comment": "Local ID of spatial node" },
+        "category": { "type": "string", "comment": "Category of spatial node" },
+        "children": { "type": "[SpatialStructure]", "comment": "Child spatial nodes" }
+      }
+    },
+    "Model": {
+      "comment": "Root type - entry point of all Fragment files",
+      "fields": {
+        "metadata": { "type": "string", "comment": "JSON string for generic file data" },
+        "guids": { "type": "[string]", "required": true, "comment": "Global Unique Identifiers of items" },
+        "guids_items": { "type": "[uint]", "required": true, "comment": "Maps localIds indices to guids" },
+        "max_local_id": { "type": "uint", "comment": "Smallest available localID for new items" },
+        "local_ids": { "type": "[uint]", "required": true, "comment": "File-specific item IDs" },
+        "categories": { "type": "[string]", "required": true, "comment": "All item categories as strings" },
+        "meshes": { "type": "Meshes", "required": true, "comment": "All explicit geometries" },
+        "attributes": { "type": "[Attribute]", "comment": "Item data as arrays of arrays" },
+        "relations": { "type": "[Relation]", "comment": "Relations between items" },
+        "relations_items": { "type": "[int]", "comment": "Maps localIds indices to relations" },
+        "guid": { "type": "string", "required": true, "comment": "Unique model identifier" },
+        "spatial_structure": { "type": "SpatialStructure", "comment": "Spatial relation tree" },
+        "unique_attributes": { "type": "[string]", "comment": "Unique item attribute names" },
+        "relation_names": { "type": "[string]", "comment": "Unique relation names" }
+      }
+    }
+  }
+}
