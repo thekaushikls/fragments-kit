@@ -1,9 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "defragger"
+name = "fragments-kit"
 version = "0.1.0"
-description = "Add your description here"
+description = "Unofficial port of the Fragments library - to store, display, navigate, and edit massive amounts of BIM data with exceptional efficiency - on any device."
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
     "flatbuffers>=25.12.19",
     "numpy>=2.4.3",
